@@ -11,7 +11,7 @@ if (isset($_SESSION['toppings'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $toppings[] = $_POST['topping'];
 }
-var_dump($toppings);
+
 foreach ($toppings as $topping){
     echo "<li> {$topping} </li>";
 }
