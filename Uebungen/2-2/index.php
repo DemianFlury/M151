@@ -12,13 +12,17 @@ try {
 } catch(PDOException $e) {
   echo "Connection failed: " . $e->getMessage();
 }
-
-$sql = "SELECT * FROM customers";
+$jobTitle = $_GET['jobTitle'];
+$sql = "SELECT * FROM customers where job_title = :job_title";
+$statement = $conn->prepare($sql);
+$statement->execute([
+  ':job_title' => $jobTitle
+])
 ?>
 
 <table>
     <?php
-    foreach($conn->query($sql) as $row){
+    while($row = $statement->fetch()){
 
         echo "<tr>";
             echo "<td>{$row['last_name']}</td>";
