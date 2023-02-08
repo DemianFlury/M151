@@ -3,7 +3,8 @@
 
 <ul>
 <?php
-$toppings = array();
+session_start();
+$toppings = [];
 if (isset($_SESSION['toppings'])) {
     $toppings = $_SESSION['toppings'];
 }
