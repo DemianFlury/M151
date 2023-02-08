@@ -1,4 +1,5 @@
 <?php
+include_once '../../dump.php';
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -16,8 +17,12 @@ mysqli_select_db($conn, $database);
 
 echo "Datenbank ausgewählt!<br />";
 
-$sql = "SELECT * FROM customers WHERE job_title = 'Purchasing Representative'";
-$result = $conn->query($sql);
+$title = $_GET['jobtitle'];
+$sql = 'SELECT * FROM customers WHERE job_title = :title';
+$result = $conn->prepare($sql);
+$result->execute([
+  ':title' => $title
+]);
 
 if ($result->num_rows > 0) {
   echo $result->num_rows . " Resultate";
@@ -28,10 +33,5 @@ if ($result->num_rows > 0) {
 
 mysqli_close($conn);
 
-
-function dump ($result){
-    echo "<pre>";
-    var_dump($result);
-    echo "</pre>";
-}
+dump($result)
 ?>
