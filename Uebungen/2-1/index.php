@@ -25,7 +25,13 @@ if ($result->num_rows > 0) {
   echo "Keine Resultate vorhanden";
 }
 
-var_dump($result);
 
 mysqli_close($conn);
+
+
+function dump ($result){
+    echo "<pre>";
+    var_dump($result);
+    echo "</pre>";
+}
 ?>
