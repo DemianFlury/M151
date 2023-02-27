@@ -14,8 +14,18 @@ try {
 }
 
 $id = $_GET['id'];
-$sql = 'DELETE FROM orders WHERE id = :id';
-$statement = $conn->prepare($sql);
+sendDeleteStatement('invoices', 'order_id', $id, $conn);
+sendDeleteStatement('order_details', 'order_id', $id, $conn);
+sendDeleteStatement('orders', 'id', $id, $conn);
+
+function sendDeleteStatement($table, $row, $id, $pdo){
+
+$sql = "DELETE FROM $table WHERE $row = :id";
+$statement = $pdo->prepare($sql);
 $statement->execute([
-    ':id' => $id
+  ':id' => $id
 ]);
+}
+
+echo "deletion sucessful";
+header('Location: ' . $_SERVER['HTTP_REFERER']);
