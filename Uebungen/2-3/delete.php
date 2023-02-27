@@ -13,17 +13,15 @@ try {
   echo "Connection failed: " . $e->getMessage();
 }
 
-$id = $_GET['id'];
-sendDeleteStatement('invoices', 'order_id', $id, $conn);
-sendDeleteStatement('order_details', 'order_id', $id, $conn);
+sendDeleteStatement('invoices', 'order_id', $conn);
+sendDeleteStatement('order_details', 'order_id', $conn);
 sendDeleteStatement('orders', 'id', $id, $conn);
 
-function sendDeleteStatement($table, $row, $id, $pdo){
-
+function sendDeleteStatement($table, $row, $pdo){
 $sql = "DELETE FROM $table WHERE $row = :id";
 $statement = $pdo->prepare($sql);
 $statement->execute([
-  ':id' => $id
+  ':id' => $_GET['id']
 ]);
 }
 
