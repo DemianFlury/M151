@@ -1,50 +1,58 @@
 <?php
-if (isset($_GET['id']))
-{
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $database = "northwind";
-    try
-    {
-        $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password); //setzt den Typ der Datenbank fest
-
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); //setzt die Attribute des PDOs 
-        echo "Connected successfully";
-    }
-    catch (PDOException $e)
-    {
-        echo "Connection failed: " . $e->getMessage();
-    }
-
-    $id = $_GET['id'];
-    $sql = 'SELECT * FROM customers WHERE id = :id';
+// Connect DB
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "northwind";
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "<div class='disconnected'>";
+    echo "Connection failed: " . $e->getMessage() . "<br>";
+    echo "</div>";
+}
+// load data
+$preset = null;
+if (isset($_GET['id']) && $_GET['id'] !== '') {
+    $sql = "SELECT * FROM customers WHERE id = :id";
     $statement = $conn->prepare($sql);
     $statement->execute([
-      ':id' => $id
+        ':id' => $_GET['id']
     ]);
-    while($row = $statement->fetch()){ ?>
-    
-
-<form action="insert.php" method="POST">
-    <input type="text" name="firstName" placeholder="first Name" value="<?= $row['first_name'] ?>"> <br>
-    <input type="text" name="lastName" placeholder="last Name" value="<?= $row['last_name'] ?>"><br>
-    <input type="text" name="company" placeholder="company" value="<?= $row['company'] ?>"><br>
-    <input type="email" name="email" placeholder="email" value="<?= $row['email_address']?>"><br>
-    <input type="text" name="jobTitle" placeholder="job title" value="<?= $row['job_title']?>"><br>
-    <input type="phone" name="businessPhone" placeholder="Business Phone" value="<?= $row['business_phone']?>"><br>
-    <input type="phone" name="mobilePhone" placeholder="Mobile Phone" value="<?= $row['mobile_phone']?>"><br>
-    <input type="phone" name="homePhone" placeholder="Home Phone" value="<?= $row['home_phone']?>"><br>
-    <input type="phone" name="fax" placeholder="Fax Number" value="<?= $row['fax_number']?>"><br>
-    <input type="text" name="address" placeholder="Address" value="<?= $row['address']?>"><br>
-    <input type="text" name="city" placeholder="city" value="<?= $row['city']?>"><br>
-    <input type="text" name="stateProvince" placeholder="State / Province" value="<?= $row['state_province']?>"><br>
-    <input type="text" name="zipCode" placeholder="Zip code" value="<?= $row['zip_postal_code']?>"><br>
-    <input type="text" name="country" placeholder="Country" value="<?= $row['country_region']?>"><br>
-    <input type="text" name="webPage" placeholder="Web Page" value="<?= $row['web_page']?>"><br>
-    <input type="text" name="notes" placeholder="notes" value="<?= $row['notes']?>"><br>
-    <input type="hidden" name="id" value="<?= $row['id']?>">
-    <button type="submit">Send</button>
+    $preset = $statement->fetch();
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if ($preset) {
+        $sql = "UPDATE customers SET company = :company,
+                     last_name = :last_name,
+                     first_name = :first_name,
+                     email_address = :email_address
+                 WHERE id = :id";
+        $statement = $conn->prepare($sql);
+        $statement->execute([
+            ':company' => $_POST['company'],
+            ':last_name' => $_POST['last_name'],
+            ':first_name' => $_POST['first_name'],
+            ':email_address' => $_POST['email_address'],
+            ':id' => $_GET['id'],
+        ]);
+        $sql = "SELECT * FROM customers WHERE id = :id";
+        $statement = $conn->prepare($sql);
+        $statement->execute([
+            ':id' => $_GET['id']
+        ]);
+        $preset = $statement->fetch();
+    } else {
+        header('Location: index.php');
+        die();
+    }
+}
+?>
+<form method="POST" action="edit.php?id=<?= $preset ? $preset['id'] : '' ?>">
+    <input value="<?= $preset ? $preset['company'] : ''  ?>" type="text" name="company" placeholder="Firma"><br>
+    <input value="<?= $preset ? $preset['last_name'] : ''  ?>" type="text" name="last_name" placeholder="Nachname"><br>
+    <input value="<?= $preset ? $preset['first_name'] : ''  ?>" type="text" name="first_name" placeholder="Vorname"><br>
+    <input value="<?= $preset ? $preset['email_address'] : ''  ?>" type="email" name="email_address" placeholder="Email"><br>
+    <button type="submit">Speichern</button>
 </form>
-
-<?php } } ?>

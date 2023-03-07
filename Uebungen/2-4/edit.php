@@ -5,16 +5,16 @@ $password = "";
 $database = "northwind";
 
 try {
-  $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password); //setzt den Typ der Datenbank fest
+  $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password); //set database type
 
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); //setzt die Attribute des PDOs 
-  echo "Connected successfully";
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); //set pdo attributes
 } catch(PDOException $e) {
   echo "Connection failed: " . $e->getMessage();
 }
 
-$sql = "INSERT INTO customers (first_name, last_name, company, email_address, job_title, business_phone, home_phone, mobile_phone, fax_number, address, city, state_province, zip_postal_code, country_region, web_page, notes)
- VALUES (:firstName, :lastName, :company, :emailAddress, :jobTitle, :businessPhone, :homePhone, :mobilePhone, :faxNumber, :address, :city, :stateProvince, :zipCode, :country, :webPage, :notes)";
+$sql = "UPDATE customers 
+SET first_name=:firstName, last_name=:lastName, company=:company, email_address=:emailAddress, job_title=:jobTitle, business_phone=:businessPhone, home_phone=:homePhone, mobile_phone=:mobilePhone, fax_number=:faxNumber, address=:address, city=:city, state_province=:stateProvince, zip_postal_code=:zipCode, country_region=:country, web_page=:webPage, notes=:notes
+WHERE id = :id";
 $statement = $conn->prepare($sql);
 $statement->execute([
   ':firstName' => $_POST['firstName'],
@@ -32,7 +32,8 @@ $statement->execute([
   ':zipCode' => $_POST['zipCode'],
   ':country' => $_POST['country'],
   ':webPage' => $_POST['webPage'],
-  ':notes' => $_POST['notes']
+  ':notes' => $_POST['notes'],
+  ':id' => $_GET['id']
 ]);
 
 header('Location: ' . $_SERVER['HTTP_REFERER']);
